@@ -1,0 +1,71 @@
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    entities(orderBy: _ @orderBy(columns:["salary","name","email","docker","agile","start"])): [Entity!]! @paginate(defaultCount: 15)
+    entity(id: ID @eq): Entity @find
+}
+
+"""{entities(
+orderBy: {column:SALARY,order:DESC}
+first: 10
+page: 10
+){paginatorInfo{count,currentPage,firstItem,lastItem,lastPage,total},
+  data{id,salary,name,email,docker,agile,start,senior,fullstack,description}}}"""
+
+type Entity {
+    id: ID!
+    salary: String!
+    name: String!
+    email: String!
+    docker: Boolean!
+    agile: Boolean!
+    start: Date!
+    senior: Boolean
+    fullstack: Boolean
+    description: String
+}
+
+""" mutation{
+ entitycreate(
+      salary: 859706,
+        name: "Dr. Ivory Herman",
+        email: "lizethsdffgh63@example.com",
+        docker: 0,
+        agile: 1,
+        start: "2021-03-11",
+        senior: null,
+        fullstack: null,
+        description: null
+){id}
+}"""
+
+type Mutation {
+  entitycreate(
+  	salary: Int! @rules(apply: ["required","numeric","gte:600000","lte:900000"]),
+  	name: String! @rules(apply: ["required","string","min:5"]),
+  	email: String! @rules(apply: ["required","string","email","unique:entities,email"]),
+  	docker: Int! @rules(apply: ["required","boolean"]),
+  	agile: Int! @rules(apply: ["required","boolean"]),
+  	start: String! @rules(apply: ["required","date","date_format:Y-m-d","before:2021-04-02","after:tomorrow"]),
+  	senior: Int @rules(apply: ["nullable","boolean"]),
+  	fullstack: Int @rules(apply: ["nullable","boolean"]),
+  	description: String @rules(apply: ["nullable","boolean"])
+  ): Entity! @create
+
+  entityupdate(
+    id: Int! @rules(apply: ["required","numeric"]),
+    salary: Int! @rules(apply: ["required","numeric","gte:600000","lte:900000"]),
+    name: String! @rules(apply: ["required","string","min:5"]),
+    docker: Int! @rules(apply: ["required","boolean"]),
+    agile: Int! @rules(apply: ["required","boolean"]),
+    start: String! @rules(apply: ["required","date","date_format:Y-m-d","before:2021-04-02","after:tomorrow"]),
+    senior: Int @rules(apply: ["nullable","boolean"]),
+    fullstack: Int @rules(apply: ["nullable","boolean"]),
+    description: String @rules(apply: ["nullable","boolean"])
+  ): Entity! @update
+
+ }
