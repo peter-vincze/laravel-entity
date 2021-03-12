@@ -100,7 +100,7 @@ class EntityController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         return new EntityResource(Entity::findOrFail($id));
     }
@@ -112,7 +112,7 @@ class EntityController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EntityStoreRequest $request, $id)
+    public function update(EntityStoreRequest $request, int $id)
     {
         return $this->storeToModel($request, 0, $id);
     }
@@ -122,7 +122,7 @@ class EntityController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         Entity::destroy($id);
         return response()->json(['message' => __('entity.destroyed_success', ['id' => $id])]);

@@ -60,12 +60,13 @@ type Mutation {
     id: Int! @rules(apply: ["required","numeric"]),
     salary: Int! @rules(apply: ["required","numeric","gte:600000","lte:900000"]),
     name: String! @rules(apply: ["required","string","min:5"]),
+    email: String! @rules(apply: ["required","string","email"]),
     docker: Int! @rules(apply: ["required","boolean"]),
     agile: Int! @rules(apply: ["required","boolean"]),
     start: String! @rules(apply: ["required","date","date_format:Y-m-d","before:2021-04-02","after:tomorrow"]),
     senior: Int @rules(apply: ["nullable","boolean"]),
     fullstack: Int @rules(apply: ["nullable","boolean"]),
     description: String @rules(apply: ["nullable","boolean"])
-  ): Entity! @update
+  ): Entity! @validator @update
 
  }

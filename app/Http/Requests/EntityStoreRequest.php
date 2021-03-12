@@ -4,31 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Entity;
+use Illuminate\Validation\Validator;
 
 class EntityStoreRequest extends FormRequest
 {
-    /**
-     * Configure the validator instance.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
-     */
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $request = request();
-            if ($request->route('entity')) {
-                Entity::findOrFail($request->route('entity'));
-            }
-            if ($request->routeIs('entity.store') &&
-                Entity::where('email', $request->email)->count() > 0 ||
-                $request->routeIs('entity.update') &&
-                Entity::where('email', $request->email)->where('id', '!=', $request->route('entity'))->count() > 0
-            ) {
-                    $validator->errors()->add('email', __('entity.email_is_already_in_use', ['email' => $request->email]));
-            }
-        });
-    }
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -46,10 +25,13 @@ class EntityStoreRequest extends FormRequest
      */
     public function rules()
     {
+        $request = request();
+        $request->routeIs('entity.store');
+        $uniqueAddable = $request->routeIs('entity.store') ? "" : "," . $request->route('entity');
         return [
             'salary'      => 'required|numeric|gte:600000|lte:900000',
             'name'        => 'required|string|min:5',
-            'email'       => 'required|string|email',
+            'email'       => "required|string|email|unique:entities,email{$uniqueAddable}",
             'docker'      => 'required|boolean',
             'agile'       => 'required|boolean',
             'start'       => 'required|date|date_format:Y-m-d|before:2021-06-16|after:tomorrow',
